@@ -3,8 +3,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import Vapi from '@vapi-ai/web';
 
-const VAPI_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY || '';
-const ASSISTANT_ID = 'd476d365-e717-4007-be37-7a4e2db3f36b';
+// Hardcoded for reliability - env vars can be flaky with Next.js static builds
+const VAPI_PUBLIC_KEY = '58d3e7c2-5eb3-47dd-a304-5b6a55447ecc';
+const ASSISTANT_ID = '5c494144-a5fb-4593-a282-b8ec0c086b8c';
 
 type CallStatus = 'idle' | 'connecting' | 'active' | 'ending';
 
@@ -151,16 +152,20 @@ export default function VoiceAgent() {
         <span className="text-sm text-slate-500 font-medium">{getStatusText()}</span>
       </div>
 
-      {/* Transcript container - navy framed */}
-      <div className="w-full max-w-sm">
-        <div className="rounded-xl border-2 border-slate-800 bg-slate-50/50 overflow-hidden">
-          <div className="bg-slate-800 px-4 py-2">
-            <p className="text-xs text-slate-300 uppercase tracking-wider font-medium">Transcription</p>
+      {/* Transcript container - wide and polished */}
+      <div className="w-full max-w-2xl px-4">
+        <div className="rounded-2xl border border-slate-200 bg-white shadow-lg shadow-slate-200/50 overflow-hidden">
+          <div className="bg-gradient-to-r from-slate-800 to-slate-700 px-5 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
+              <p className="text-sm text-white font-medium">Transcription en direct</p>
+            </div>
+            <span className="text-xs text-slate-400">Sophie AI</span>
           </div>
-          <div className="p-4 min-h-[120px] max-h-[160px] overflow-y-auto">
+          <div className="p-5 min-h-[140px] max-h-[200px] overflow-y-auto bg-gradient-to-b from-slate-50/50 to-white">
             {transcript.length > 0 ? (
-              <div className="space-y-2">
-                {transcript.slice(-6).map((line, i) => {
+              <div className="space-y-3">
+                {transcript.slice(-8).map((line, i) => {
                   const isAssistant = line.toLowerCase().startsWith('assistant:');
                   const isUser = line.toLowerCase().startsWith('user:');
                   const content = line.replace(/^(assistant|user):\s*/i, '');
@@ -168,25 +173,35 @@ export default function VoiceAgent() {
                   return (
                     <div
                       key={i}
-                      className={`text-sm leading-relaxed ${
-                        isAssistant
-                          ? 'text-teal-700'
-                          : isUser
-                            ? 'text-slate-700'
-                            : 'text-slate-600'
-                      }`}
+                      className={`flex gap-3 ${isUser ? 'justify-end' : 'justify-start'}`}
                     >
-                      {isAssistant && <span className="text-teal-500 font-medium text-xs mr-1">AI:</span>}
-                      {isUser && <span className="text-slate-400 font-medium text-xs mr-1">Vous:</span>}
-                      {content}
+                      <div
+                        className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
+                          isAssistant
+                            ? 'bg-teal-50 text-teal-800 border border-teal-100 rounded-tl-sm'
+                            : isUser
+                              ? 'bg-slate-800 text-white rounded-tr-sm'
+                              : 'bg-slate-100 text-slate-600'
+                        }`}
+                      >
+                        {isAssistant && <span className="text-teal-500 font-semibold text-xs block mb-1">Sophie</span>}
+                        {isUser && <span className="text-slate-400 font-semibold text-xs block mb-1">Vous</span>}
+                        {content}
+                      </div>
                     </div>
                   );
                 })}
               </div>
             ) : (
-              <p className="text-sm text-slate-400 text-center py-8">
-                La transcription apparaîtra ici...
-              </p>
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-3">
+                  <svg className="w-6 h-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                </div>
+                <p className="text-sm text-slate-500 font-medium">Conversation</p>
+                <p className="text-xs text-slate-400 mt-1">La transcription apparaitra ici</p>
+              </div>
             )}
           </div>
         </div>

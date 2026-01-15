@@ -28,63 +28,79 @@ VAPI MCP server connected via `mcp.json`:
 curl -s -X GET "https://api.vapi.ai/assistant" -H "Authorization: Bearer $VAPI_TOKEN"
 ```
 
-## VAPI Resources (Deployed Jan 2025)
+## VAPI Resources (Updated Jan 2026)
 
 ### Assistant
 - **Name**: Sophie - Acces Croisieres
-- **ID**: `d476d365-e717-4007-be37-7a4e2db3f36b`
-- **Voice**: 11labs (sarah)
-- **Transcriber**: deepgram nova-3
-- **LLM**: claude-3-5-sonnet-20241022
-- **Languages**: French (primary), English (auto-detect)
+- **ID**: `5c494144-a5fb-4593-a282-b8ec0c086b8c`
+- **Voice**: ElevenLabs `sarah` with `eleven_multilingual_v2` model
+- **Transcriber**: Deepgram `nova-3` (multilingual)
+- **LLM**: OpenAI `gpt-4o`
+- **Languages**: French/English (auto-detect via multilingual transcriber)
+- **Background**: Office ambiance enabled
+- **Max Duration**: 10 minutes
 
 ### Tools
 | Tool | ID | Type |
 |------|-----|------|
-| SMS Confirmation | `9590301d-b302-48fb-a462-f5c3a13284a6` | sms |
-| Transfer to Consultant | `774dfa98-ab53-4c94-b294-33cf735143d2` | transferCall |
-| Lead Capture | `9b790a08-c535-40f8-a243-bb2c7e63e3b9` | function |
-| Search Trips | (create via dashboard - see below) | function |
+| Lead Capture | `c5d356ee-d5c1-4704-8c3e-5e853af61953` | function |
+| Search Trips | `67595e3f-9079-44b0-893a-504b95efbfd7` | function |
+| Browse Website | `156c7f1e-30ec-464c-99b9-24408213e3cc` | function |
 
-### Search Trips Tool (Manual Creation Required)
-Create this tool in VAPI Dashboard > Tools > Create Tool:
-
+#### Browse Website Tool Configuration
 ```json
 {
   "type": "function",
   "function": {
-    "name": "search_available_trips",
-    "description": "Search for available travel packages based on destination, budget, and travel dates. Use this when caller asks about specific trips, deals, or package availability.",
+    "name": "browse_website",
+    "description": "Search the Acces Croisieres website for cruises, exclusive deals, and European circuits. Use when caller asks about current offerings or wants to browse available trips.",
     "parameters": {
       "type": "object",
       "properties": {
-        "destination": {
+        "category": {
           "type": "string",
-          "description": "Destination country, region, or city (e.g., Mexico, Cuba, Riviera Maya)"
+          "enum": ["croisieres", "prix-exclusifs", "circuit-europe"],
+          "description": "Trip type: croisieres (accompanied cruises), prix-exclusifs (exclusive deals), circuit-europe (European circuits)"
         },
-        "budget_max": {
+        "max_price": {
           "type": "number",
-          "description": "Maximum budget per person in CAD"
+          "description": "Maximum price per person in CAD"
         },
-        "trip_type": {
+        "search_query": {
           "type": "string",
-          "enum": ["cruise", "all-inclusive", "safari", "golf", "tour"],
-          "description": "Type of trip"
-        },
-        "departure_month": {
-          "type": "string",
-          "description": "Month of travel (e.g., February, March)"
+          "description": "Free text search query"
         }
       }
     }
   },
   "server": {
-    "url": "https://glzubknrxftcwzfetzit.supabase.co/functions/v1/search-trips"
+    "url": "https://oatuumaqkjwsatpmdnes.supabase.co/functions/v1/browse-website"
   }
 }
 ```
 
-After creating, attach to Sophie assistant (`d476d365-e717-4007-be37-7a4e2db3f36b`).
+### Voice Configuration
+```json
+{
+  "provider": "11labs",
+  "voiceId": "sarah",
+  "model": "eleven_multilingual_v2",
+  "stability": 0.5,
+  "similarityBoost": 0.75,
+  "useSpeakerBoost": true,
+  "optimizeStreamingLatency": 3
+}
+```
+
+### Transcriber Configuration
+```json
+{
+  "provider": "deepgram",
+  "model": "nova-3",
+  "language": "multi",
+  "smartFormat": true
+}
+```
 
 ### Phone Numbers
 - None configured yet (use VAPI dashboard to purchase/import)
@@ -96,7 +112,7 @@ Or create outbound call with curl:
 curl -X POST "https://api.vapi.ai/call" \
   -H "Authorization: Bearer $VAPI_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"assistantId": "d476d365-e717-4007-be37-7a4e2db3f36b", "customer": {"number": "+1XXXXXXXXXX"}}'
+  -d '{"assistantId": "5c494144-a5fb-4593-a282-b8ec0c086b8c", "customer": {"number": "+1XXXXXXXXXX"}}'
 ```
 
 ## VAPI Configuration
@@ -121,6 +137,9 @@ Languages: French (primary), English
 - [x] SMS tool attached
 - [x] Transfer call tool attached
 - [x] Lead capture tool attached
+- [x] Search trips tool attached
+- [x] Browse website edge function deployed
+- [x] Browse website VAPI tool created and attached
 - [x] API token secured (not hardcoded)
 - [x] System prompt version controlled (`prompts/sophie-system-prompt.md`)
 - [x] Documentation complete
@@ -131,23 +150,32 @@ Languages: French (primary), English
 
 ## Supabase Integration
 
-- **Project ID**: `glzubknrxftcwzfetzit`
-- **Project URL**: `https://glzubknrxftcwzfetzit.supabase.co`
-- **Lead Capture Webhook**: `https://glzubknrxftcwzfetzit.supabase.co/functions/v1/capture-lead`
+- **Project ID**: `oatuumaqkjwsatpmdnes`
+- **Project Name**: `acces-voyages`
+- **Project URL**: `https://oatuumaqkjwsatpmdnes.supabase.co`
+- **Lead Capture Webhook**: `https://oatuumaqkjwsatpmdnes.supabase.co/functions/v1/capture-lead`
+- **Search Trips Endpoint**: `https://oatuumaqkjwsatpmdnes.supabase.co/functions/v1/search-trips`
+- **Browse Website Endpoint**: `https://oatuumaqkjwsatpmdnes.supabase.co/functions/v1/browse-website`
 
 ### Tables
 - `leads` - Captured lead information (name, phone, destination, trip_type, budget, etc.)
 - `appointments` - Booked consultation appointments
-- `trips` - Travel packages from accesvoyages.ca (35 trips: 18 exclusive, 13 weekly deals, 4 boxprix)
+- `trips` - Travel packages from accesvoyages.ca
 
 ### Edge Functions
-- `capture-lead` - Webhook endpoint for VAPI lead capture tool
-- `search-trips` - Search endpoint for trip availability (used by search_available_trips tool)
+- `capture-lead` - Webhook endpoint for VAPI lead capture tool (JWT disabled for webhook access)
+- `search-trips` - Search endpoint for trip availability (JWT disabled for VAPI access)
+- `browse-website` - Scrapes accescroisieres.com for real-time cruise/tour listings (JWT disabled for VAPI access)
 
 ### VAPI Tool Update Required
 Update the Lead Capture tool (`9b790a08-c535-40f8-a243-bb2c7e63e3b9`) server URL to:
 ```
-https://glzubknrxftcwzfetzit.supabase.co/functions/v1/capture-lead
+https://oatuumaqkjwsatpmdnes.supabase.co/functions/v1/capture-lead
+```
+
+Update or create Search Trips tool server URL:
+```
+https://oatuumaqkjwsatpmdnes.supabase.co/functions/v1/search-trips
 ```
 
 ## Demo Web App

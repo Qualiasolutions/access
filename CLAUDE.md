@@ -44,6 +44,47 @@ curl -s -X GET "https://api.vapi.ai/assistant" -H "Authorization: Bearer $VAPI_T
 | SMS Confirmation | `9590301d-b302-48fb-a462-f5c3a13284a6` | sms |
 | Transfer to Consultant | `774dfa98-ab53-4c94-b294-33cf735143d2` | transferCall |
 | Lead Capture | `9b790a08-c535-40f8-a243-bb2c7e63e3b9` | function |
+| Search Trips | (create via dashboard - see below) | function |
+
+### Search Trips Tool (Manual Creation Required)
+Create this tool in VAPI Dashboard > Tools > Create Tool:
+
+```json
+{
+  "type": "function",
+  "function": {
+    "name": "search_available_trips",
+    "description": "Search for available travel packages based on destination, budget, and travel dates. Use this when caller asks about specific trips, deals, or package availability.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "destination": {
+          "type": "string",
+          "description": "Destination country, region, or city (e.g., Mexico, Cuba, Riviera Maya)"
+        },
+        "budget_max": {
+          "type": "number",
+          "description": "Maximum budget per person in CAD"
+        },
+        "trip_type": {
+          "type": "string",
+          "enum": ["cruise", "all-inclusive", "safari", "golf", "tour"],
+          "description": "Type of trip"
+        },
+        "departure_month": {
+          "type": "string",
+          "description": "Month of travel (e.g., February, March)"
+        }
+      }
+    }
+  },
+  "server": {
+    "url": "https://glzubknrxftcwzfetzit.supabase.co/functions/v1/search-trips"
+  }
+}
+```
+
+After creating, attach to Sophie assistant (`d476d365-e717-4007-be37-7a4e2db3f36b`).
 
 ### Phone Numbers
 - None configured yet (use VAPI dashboard to purchase/import)
@@ -97,9 +138,11 @@ Languages: French (primary), English
 ### Tables
 - `leads` - Captured lead information (name, phone, destination, trip_type, budget, etc.)
 - `appointments` - Booked consultation appointments
+- `trips` - Travel packages from accesvoyages.ca (35 trips: 18 exclusive, 13 weekly deals, 4 boxprix)
 
 ### Edge Functions
 - `capture-lead` - Webhook endpoint for VAPI lead capture tool
+- `search-trips` - Search endpoint for trip availability (used by search_available_trips tool)
 
 ### VAPI Tool Update Required
 Update the Lead Capture tool (`9b790a08-c535-40f8-a243-bb2c7e63e3b9`) server URL to:

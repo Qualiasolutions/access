@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Agent Training Guide | Qualia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --teal-600: #0d9488;
+      --teal-500: #14b8a6;
+      --teal-100: #ccfbf1;
+      --teal-50: #f0fdfa;
+      --slate-800: #1e293b;
+      --slate-700: #334155;
+      --slate-600: #475569;
+      --slate-500: #64748b;
+      --slate-400: #94a3b8;
+      --slate-300: #cbd5e1;
+      --slate-200: #e2e8f0;
+      --slate-100: #f1f5f9;
+      --slate-50: #f8fafc;
+      --white: #ffffff;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--white);
+      color: var(--slate-800);
+      line-height: 1.6;
+    }
+
+    /* Navigation */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: var(--white);
+      border-bottom: 2px solid var(--slate-800);
+      z-index: 100;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .nav-brand svg {
+      width: 40px;
+      height: 40px;
+    }
+
+    .nav-brand span {
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: var(--slate-800);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .nav-link {
+      padding: 0.5rem 1.25rem;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.875rem;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      border: 2px solid transparent;
+    }
+
+    .nav-link.active {
+      background: var(--teal-600);
+      color: var(--white);
+    }
+
+    .nav-link:not(.active) {
+      color: var(--slate-600);
+      border-color: var(--slate-300);
+    }
+
+    .nav-link:not(.active):hover {
+      border-color: var(--teal-600);
+      color: var(--teal-600);
+    }
+
+    /* Page Sections */
+    .page {
+      display: none;
+      padding: 6rem 2rem 3rem;
+      min-height: 100vh;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* Page Header */
+    .page-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .page-header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--slate-800);
+      margin-bottom: 0.5rem;
+    }
+
+    .page-header p {
+      color: var(--teal-600);
+      font-weight: 500;
+    }
+
+    /* Table Styles */
+    .methods-table {
+      background: var(--white);
+      border: 2px solid var(--slate-800);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+
+    .table-header {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      background: var(--slate-800);
+      color: var(--white);
+      font-weight: 600;
+    }
+
+    .table-header > div {
+      padding: 1rem 1.25rem;
+    }
+
+    .table-header > div:first-child {
+      border-right: 1px solid var(--slate-600);
+    }
+
+    .table-row {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      border-bottom: 1px solid var(--slate-200);
+      transition: background 0.2s ease;
+    }
+
+    .table-row:last-child {
+      border-bottom: none;
+    }
+
+    .table-row:hover {
+      background: var(--teal-50);
+    }
+
+    .table-row > div {
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .table-row > div:first-child {
+      border-right: 1px solid var(--slate-200);
+      gap: 0.75rem;
+      font-weight: 500;
+    }
+
+    .table-row > div:last-child {
+      color: var(--slate-600);
+    }
+
+    .icon-box {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--teal-50);
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+
+    .icon-box svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--teal-600);
+    }
+
+    /* Insight Box */
+    .insight-box {
+      background: var(--teal-600);
+      border: 2px solid var(--slate-800);
+      border-radius: 8px;
+      padding: 1.5rem;
+      color: var(--white);
+      margin-bottom: 2rem;
+    }
+
+    .insight-box h3 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.125rem;
+      margin-bottom: 1rem;
+    }
+
+    .insight-box h3 svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .insight-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .insight-card {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 8px;
+      padding: 1rem;
+    }
+
+    .insight-card h4 {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .insight-card .subtitle {
+      color: var(--teal-100);
+      font-size: 0.875rem;
+    }
+
+    .insight-card .detail {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.7);
+      margin-top: 0.5rem;
+    }
+
+    /* Example Cards */
+    .examples-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    .example-card {
+      background: var(--white);
+      border: 2px solid var(--slate-800);
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+
+    .example-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .example-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .example-badge.teal {
+      background: var(--teal-600);
+      color: var(--white);
+    }
+
+    .example-badge.dark {
+      background: var(--slate-800);
+      color: var(--white);
+    }
+
+    .example-label {
+      font-size: 0.875rem;
+      color: var(--slate-500);
+    }
+
+    .code-block {
+      background: var(--slate-50);
+      border-radius: 6px;
+      padding: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--slate-700);
+      border-left: 4px solid var(--teal-600);
+    }
+
+    .code-block.dark-border {
+      border-left-color: var(--slate-800);
+    }
+
+    .code-block p {
+      margin-bottom: 0.5rem;
+    }
+
+    .code-block p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Page 2 Styles */
+    .definition-box {
+      background: var(--slate-800);
+      border-radius: 8px;
+      padding: 1.5rem;
+      color: var(--white);
+      margin-bottom: 2rem;
+    }
+
+    .definition-box h2 {
+      font-size: 1.125rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .definition-box p {
+      color: var(--slate-300);
+    }
+
+    .definition-box .highlight {
+      color: var(--teal-500);
+      font-weight: 600;
+    }
+
+    .definition-box .muted {
+      color: var(--slate-400);
+    }
+
+    .definition-box .small {
+      font-size: 0.875rem;
+      margin-top: 0.75rem;
+      color: var(--slate-400);
+    }
+
+    /* Layers Section */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .layers-section h3,
+    .flow-section h3 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      color: var(--slate-800);
+    }
+
+    .layers-section h3 svg,
+    .flow-section h3 svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--teal-600);
+    }
+
+    .layer-item {
+      padding: 1rem;
+      border: 2px solid var(--slate-200);
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .layer-item:hover {
+      border-color: var(--slate-400);
+    }
+
+    .layer-item.active {
+      border-color: var(--teal-600);
+      background: var(--teal-50);
+    }
+
+    .layer-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .layer-icon {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--slate-100);
+      border-radius: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .layer-item.active .layer-icon {
+      background: var(--teal-600);
+    }
+
+    .layer-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: var(--teal-600);
+      transition: stroke 0.2s ease;
+    }
+
+    .layer-item.active .layer-icon svg {
+      stroke: var(--white);
+    }
+
+    .layer-info {
+      flex: 1;
+    }
+
+    .layer-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .layer-tag {
+      font-size: 0.65rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .layer-tag.required {
+      background: var(--teal-600);
+      color: var(--white);
+    }
+
+    .layer-tag.optional {
+      background: var(--slate-200);
+      color: var(--slate-600);
+    }
+
+    .layer-desc {
+      font-size: 0.8rem;
+      color: var(--slate-500);
+      margin-top: 0.25rem;
+    }
+
+    .layer-details {
+      display: none;
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--teal-200);
+    }
+
+    .layer-item.active .layer-details {
+      display: block;
+    }
+
+    .layer-details p {
+      font-size: 0.8rem;
+      color: var(--slate-700);
+      margin-bottom: 0.5rem;
+    }
+
+    .layer-example {
+      background: var(--white);
+      border: 1px solid var(--teal-200);
+      border-radius: 4px;
+      padding: 0.5rem;
+      font-size: 0.75rem;
+    }
+
+    .layer-example span:first-child {
+      color: var(--teal-600);
+      font-weight: 600;
+    }
+
+    .layer-example span:last-child {
+      color: var(--slate-600);
+    }
+
+    /* Flow Diagram */
+    .flow-box {
+      background: var(--slate-50);
+      border: 2px solid var(--slate-800);
+      border-radius: 8px;
+      padding: 1.25rem;
+    }
+
+    .flow-step {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.8rem;
+    }
+
+    .flow-icon {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+
+    .flow-icon.dark {
+      background: var(--slate-800);
+    }
+
+    .flow-icon.teal {
+      background: var(--teal-600);
+    }
+
+    .flow-icon svg {
+      width: 16px;
+      height: 16px;
+      stroke: var(--white);
+    }
+
+    .flow-arrow {
+      margin-left: 0.5rem;
+      padding: 0.25rem 0;
+    }
+
+    .flow-arrow svg {
+      width: 16px;
+      height: 16px;
+      stroke: var(--slate-400);
+    }
+
+    /* Checklist */
+    .checklist-box {
+      background: var(--white);
+      border: 2px solid var(--slate-800);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-top: 1rem;
+    }
+
+    .checklist-box h4 {
+      font-size: 0.9rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .checklist-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .checklist-item svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    .checklist-item svg.check {
+      stroke: var(--teal-600);
+    }
+
+    .checklist-item svg.circle {
+      stroke: var(--slate-300);
+    }
+
+    .checklist-item.optional {
+      color: var(--slate-500);
+    }
+
+    /* Comparison Box */
+    .comparison-box {
+      background: var(--slate-50);
+      border: 2px solid var(--slate-800);
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+
+    .comparison-box h3 {
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .comparison-card {
+      background: var(--white);
+      border: 1px solid var(--slate-300);
+      border-radius: 8px;
+      padding: 1rem;
+    }
+
+    .comparison-card.highlight {
+      background: var(--teal-50);
+      border: 2px solid var(--teal-600);
+    }
+
+    .comparison-card h4 {
+      font-size: 0.9rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .comparison-card ul {
+      list-style: none;
+      font-size: 0.8rem;
+      color: var(--slate-600);
+    }
+
+    .comparison-card li {
+      margin-bottom: 0.25rem;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--slate-400);
+      font-size: 0.875rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav {
+        padding: 1rem;
+      }
+
+      .nav-brand span {
+        display: none;
+      }
+
+      .page {
+        padding: 5rem 1rem 2rem;
+      }
+
+      .table-header,
+      .table-row {
+        grid-template-columns: 1fr;
+      }
+
+      .table-header > div:first-child,
+      .table-row > div:first-child {
+        border-right: none;
+        border-bottom: 1px solid var(--slate-200);
+      }
+
+      .insight-grid,
+      .examples-grid,
+      .content-grid,
+      .comparison-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-brand">
+      <svg viewBox="0 0 100 100">
+        <ellipse cx="50" cy="42" rx="28" ry="32" fill="none" stroke="#0d9488" stroke-width="5"/>
+        <path d="M 30 70 Q 20 80, 35 85 Q 50 90, 65 85 Q 80 80, 70 70" fill="none" stroke="#0d9488" stroke-width="5" stroke-linecap="round"/>
+        <path d="M 50 74 Q 40 78, 45 82 Q 52 88, 42 85" fill="none" stroke="#0d9488" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+      <span>Qualia</span>
+    </div>
+    <div class="nav-links">
+      <a href="#" class="nav-link active" data-page="page1">Configuration Methods</a>
+      <a href="#" class="nav-link" data-page="page2">Agent Anatomy</a>
+    </div>
+  </nav>
+
+  <!-- Page 1: Configuration Methods -->
+  <section id="page1" class="page active">
+    <div class="container">
+      <div class="page-header">
+        <h1>AI Agent Configuration Methods</h1>
+        <p>How to give knowledge and behavior to AI agents</p>
+      </div>
+
+      <!-- Methods Table -->
+      <div class="methods-table">
+        <div class="table-header">
+          <div>Method</div>
+          <div>Use Case</div>
+        </div>
+        <div class="table-row">
+          <div>
+            <div class="icon-box">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" />
+              </svg>
+            </div>
+            System Prompt
+          </div>
+          <div>Core personality, rules, always-on instructions</div>
+        </div>
+        <div class="table-row">
+          <div>
+            <div class="icon-box">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" />
+              </svg>
+            </div>
+            RAG Knowledge Base
+          </div>
+          <div>Facts, docs, procedures to retrieve when relevant</div>
+        </div>
+        <div class="table-row">
+          <div>
+            <div class="icon-box">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            Fine-tuning
+          </div>
+          <div>Bake behavior into the model itself (expensive)</div>
+        </div>
+        <div class="table-row">
+          <div>
+            <div class="icon-box">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 01-3-3m3 3a3 3 0 100 6h13.5a3 3 0 100-6m-16.5-3a3 3 0 013-3h13.5a3 3 0 013 3m-19.5 0a4.5 4.5 0 01.9-2.7L5.737 5.1a3.375 3.375 0 012.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 01.9 2.7m0 0a3 3 0 01-3 3m0 3h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008zm-3 6h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008z" />
+              </svg>
+            </div>
+            Memory Store
+          </div>
+          <div>User preferences, past interactions (vector DB)</div>
+        </div>
+        <div class="table-row">
+          <div>
+            <div class="icon-box">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z" />
+              </svg>
+            </div>
+            Tool Definitions
+          </div>
+          <div>What it can/can't do</div>
+        </div>
+      </div>
+
+      <!-- Key Insight -->
+      <div class="insight-box">
+        <h3>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" />
+          </svg>
+          Key Insight
+        </h3>
+        <div class="insight-grid">
+          <div class="insight-card">
+            <h4>System Prompt</h4>
+            <div class="subtitle">= Permanent Memory</div>
+            <div class="detail">Always active, shapes every response</div>
+          </div>
+          <div class="insight-card">
+            <h4>RAG</h4>
+            <div class="subtitle">= Retrievable Knowledge</div>
+            <div class="detail">Pulled in only when relevant</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Examples -->
+      <div class="examples-grid">
+        <div class="example-card">
+          <div class="example-header">
+            <span class="example-badge teal">System Prompt</span>
+            <span class="example-label">Always remembered</span>
+          </div>
+          <div class="code-block">
+            <p>You are a customer support agent for Acme Corp.</p>
+            <p>Always be polite.</p>
+            <p>Never discuss competitors.</p>
+            <p>Escalate refunds over $100 to a human.</p>
+          </div>
+        </div>
+        <div class="example-card">
+          <div class="example-header">
+            <span class="example-badge dark">RAG</span>
+            <span class="example-label">Retrieved when relevant</span>
+          </div>
+          <div class="code-block dark-border">
+            <p>• Product specs</p>
+            <p>• Pricing information</p>
+            <p>• FAQs</p>
+            <p>• Company policies</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Page 2: Agent Anatomy -->
+  <section id="page2" class="page">
+    <div class="container">
+      <div class="page-header">
+        <h1>Anatomy of an AI Agent</h1>
+        <p>What it's made of & how to build one</p>
+      </div>
+
+      <!-- Definition -->
+      <div class="definition-box">
+        <h2>What is an AI Agent?</h2>
+        <p>
+          An AI Agent = <span class="highlight">LLM</span> + <span class="highlight">Instructions</span> + <span class="muted">(optionally)</span> <span class="highlight">Knowledge</span> + <span class="highlight">Memory</span> + <span class="highlight">Tools</span>
+        </p>
+        <p class="small">It's an LLM that has been given a specific role, access to information, and the ability to take actions.</p>
+      </div>
+
+      <!-- Main Content -->
+      <div class="content-grid">
+        <!-- Left: Layers -->
+        <div class="layers-section">
+          <h3>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+            </svg>
+            The 5 Layers (click to explore)
+          </h3>
+
+          <div class="layer-item" onclick="toggleLayer(this)">
+            <div class="layer-header">
+              <div class="layer-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 19.5V21M12 3v1.5m0 15V21m3.75-18v1.5m0 15V21m-9-1.5h10.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 6.75v10.5a2.25 2.25 0 002.25 2.25zm.75-12h9v9h-9v-9z" />
+                </svg>
+              </div>
+              <div class="layer-info">
+                <div class="layer-title">
+                  LLM (The Brain)
+                  <span class="layer-tag required">Required</span>
+                </div>
+                <div class="layer-desc">The AI model itself — GPT-4, Claude, Gemini, etc.</div>
+              </div>
+            </div>
+            <div class="layer-details">
+              <p>This is the foundation. It can understand language and generate responses. Without this, nothing works.</p>
+              <div class="layer-example">
+                <span>Example: </span>
+                <span>OpenAI API, Anthropic API, or open-source models</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="layer-item" onclick="toggleLayer(this)">
+            <div class="layer-header">
+              <div class="layer-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" />
+                </svg>
+              </div>
+              <div class="layer-info">
+                <div class="layer-title">
+                  System Prompt (Personality)
+                  <span class="layer-tag required">Required</span>
+                </div>
+                <div class="layer-desc">Instructions that define WHO the agent is and HOW it behaves.</div>
+              </div>
+            </div>
+            <div class="layer-details">
+              <p>This is where you write: "You are a customer support agent. Be polite. Never discuss competitors."</p>
+              <div class="layer-example">
+                <span>Example: </span>
+                <span>"You are a helpful sales assistant for Qualia. Always ask qualifying questions."</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="layer-item" onclick="toggleLayer(this)">
+            <div class="layer-header">
+              <div class="layer-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" />
+                </svg>
+              </div>
+              <div class="layer-info">
+                <div class="layer-title">
+                  Knowledge Base (RAG)
+                  <span class="layer-tag optional">Optional</span>
+                </div>
+                <div class="layer-desc">Documents, data, and information the agent can reference.</div>
+              </div>
+            </div>
+            <div class="layer-details">
+              <p>Upload PDFs, connect websites, add FAQs. The agent searches this when it needs specific information.</p>
+              <div class="layer-example">
+                <span>Example: </span>
+                <span>Product catalog, pricing docs, company policies, FAQs</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="layer-item" onclick="toggleLayer(this)">
+            <div class="layer-header">
+              <div class="layer-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 01-3-3m3 3a3 3 0 100 6h13.5a3 3 0 100-6m-16.5-3a3 3 0 013-3h13.5a3 3 0 013 3m-19.5 0a4.5 4.5 0 01.9-2.7L5.737 5.1a3.375 3.375 0 012.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 01.9 2.7m0 0a3 3 0 01-3 3m0 3h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008zm-3 6h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008z" />
+                </svg>
+              </div>
+              <div class="layer-info">
+                <div class="layer-title">
+                  Memory
+                  <span class="layer-tag optional">Optional</span>
+                </div>
+                <div class="layer-desc">Ability to remember past conversations and user preferences.</div>
+              </div>
+            </div>
+            <div class="layer-details">
+              <p>Without memory, every conversation starts fresh. With memory, the agent knows "this user prefers email over phone."</p>
+              <div class="layer-example">
+                <span>Example: </span>
+                <span>User preferences, conversation history, CRM data</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="layer-item" onclick="toggleLayer(this)">
+            <div class="layer-header">
+              <div class="layer-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z" />
+                </svg>
+              </div>
+              <div class="layer-info">
+                <div class="layer-title">
+                  Tools (Actions)
+                  <span class="layer-tag optional">Optional</span>
+                </div>
+                <div class="layer-desc">Things the agent can DO — not just say.</div>
+              </div>
+            </div>
+            <div class="layer-details">
+              <p>Send emails, book meetings, update databases, call APIs. This is what makes an agent more than a chatbot.</p>
+              <div class="layer-example">
+                <span>Example: </span>
+                <span>Send email, book calendar, create ticket, query database</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Flow & Checklist -->
+        <div class="flow-section">
+          <h3>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
+            </svg>
+            How It Works Together
+          </h3>
+
+          <div class="flow-box">
+            <div class="flow-step">
+              <div class="flow-icon dark">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                </svg>
+              </div>
+              <span>User asks a question</span>
+            </div>
+            <div class="flow-arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3" />
+              </svg>
+            </div>
+            <div class="flow-step">
+              <div class="flow-icon teal">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" />
+                </svg>
+              </div>
+              <span>System prompt shapes the response style</span>
+            </div>
+            <div class="flow-arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3" />
+              </svg>
+            </div>
+            <div class="flow-step">
+              <div class="flow-icon teal">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375" />
+                </svg>
+              </div>
+              <span>RAG searches for relevant info</span>
+            </div>
+            <div class="flow-arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3" />
+              </svg>
+            </div>
+            <div class="flow-step">
+              <div class="flow-icon teal">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 01-3-3m3 3a3 3 0 100 6h13.5a3 3 0 100-6m-16.5-3a3 3 0 013-3h13.5a3 3 0 013 3" />
+                </svg>
+              </div>
+              <span>Memory recalls past context</span>
+            </div>
+            <div class="flow-arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3" />
+              </svg>
+            </div>
+            <div class="flow-step">
+              <div class="flow-icon teal">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63" />
+                </svg>
+              </div>
+              <span>Tools execute actions if needed</span>
+            </div>
+            <div class="flow-arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3" />
+              </svg>
+            </div>
+            <div class="flow-step">
+              <div class="flow-icon dark">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
+                </svg>
+              </div>
+              <span>Agent responds to user</span>
+            </div>
+          </div>
+
+          <!-- Checklist -->
+          <div class="checklist-box">
+            <h4>Build Checklist</h4>
+            <div class="checklist-item">
+              <svg class="check" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Choose your LLM (GPT-4, Claude, etc.)</span>
+            </div>
+            <div class="checklist-item">
+              <svg class="check" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Write clear system prompt instructions</span>
+            </div>
+            <div class="checklist-item optional">
+              <svg class="circle" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Upload knowledge docs (if needed)</span>
+            </div>
+            <div class="checklist-item optional">
+              <svg class="circle" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Enable memory (if needed)</span>
+            </div>
+            <div class="checklist-item optional">
+              <svg class="circle" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Connect tools/integrations (if needed)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chatbot vs Agent -->
+      <div class="comparison-box">
+        <h3>Chatbot vs AI Agent — What's the difference?</h3>
+        <div class="comparison-grid">
+          <div class="comparison-card">
+            <h4>💬 Chatbot</h4>
+            <ul>
+              <li>• Only talks</li>
+              <li>• No memory between sessions</li>
+              <li>• Can't take actions</li>
+              <li>• Generic responses</li>
+            </ul>
+          </div>
+          <div class="comparison-card highlight">
+            <h4>🤖 AI Agent</h4>
+            <ul>
+              <li>• Talks + takes actions</li>
+              <li>• Remembers context</li>
+              <li>• Can send emails, book calls, update CRM</li>
+              <li>• Specialized for a role</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    Qualia Training Guide — AI Agent Fundamentals
+  </footer>
+
+  <script>
+    // Page Navigation
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const pageId = link.dataset.page;
+        
+        // Update nav links
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+        
+        // Update pages
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+      });
+    });
+
+    // Layer Toggle
+    function toggleLayer(element) {
+      const wasActive = element.classList.contains('active');
+      
+      // Remove active from all
+      document.querySelectorAll('.layer-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      
+      // Toggle clicked one
+      if (!wasActive) {
+        element.classList.add('active');
+      }
+    }
+  </script>
+</body>
+</html>
